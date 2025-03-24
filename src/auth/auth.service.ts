@@ -85,4 +85,9 @@ export class AuthService {
     await this.userRepository.save(newUser);
     return { message: 'Signup successful!' };
   }
+
+  async checkJWT(accessToken: string) {
+    const result = this.jwtService.verify(accessToken);
+    return result;
+  }
 }

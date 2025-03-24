@@ -17,7 +17,7 @@ async function bootstrap() {
 
   // 정적 파일 제공
   console.log(__dirname);
-  app.use('/static', express.static(path.join(__dirname, 'assets')));
+  app.use('/static', express.static(path.join(process.cwd(), 'assets')));
   app.use(
     `/avatars`,
     express.static(path.join(__dirname, 'assets', 'images', 'avatars')),

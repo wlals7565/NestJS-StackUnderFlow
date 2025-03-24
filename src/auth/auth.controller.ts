@@ -6,15 +6,14 @@ import {
   Res,
   Get,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { SignupDto } from './dto/signup.dto';
-import { Response } from 'express';
+import { Response, Request } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { JwtAuthGuard } from './jwt-auth.guard';
-import { GetUser } from 'src/common/decorators/get-user-decorator';
-import { User } from 'src/common/types/user.type';
 
 @Controller('auth')
 export class AuthController {
@@ -33,6 +32,8 @@ export class AuthController {
     res.cookie('access_token', result.accessToken, {
       httpOnly: true,
       maxAge: 1000 * 60 * 60,
+      secure: true,
+      sameSite: 'none',
     });
     res.json(result);
   }
@@ -49,10 +50,15 @@ export class AuthController {
   }
 
   //로그인 여부 확인
-  @UseGuards(JwtAuthGuard)
   @Get('checkAuthStatus')
-  async checkAuthStatus(@GetUser() user: User) {
-    return user;
+  async checkAuthStatus(@Req() request: Request) {
+    if (request.cookies?.['access_token']) {
+      const result = await this.authService.checkJWT(
+        request.cookies['access_token'],
+      );
+      return result;
+    }
+    return { msg: 'No Content' };
   }
 
   //로그아웃
@@ -62,7 +68,9 @@ export class AuthController {
     // access_token 쿠키 제거
     res.clearCookie('access_token', {
       httpOnly: true,
-      maxAge: 0, // 쿠키를 즉시 만료시킴
+      maxAge: 0,
+      secure: true,
+      sameSite: 'none',
     });
 
     return { message: 'Logged out successfully.' };
