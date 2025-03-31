@@ -247,7 +247,7 @@ export class PostService {
       const newComment = await this.commentRepository.save(comment);
       const result = await this.commentRepository.findOne({
         where: { id: newComment.id },
-        relations: ['recommendations'],
+        relations: ['recommendations', 'author'],
       });
       return plainToInstance(Comment, result);
     } catch (error) {

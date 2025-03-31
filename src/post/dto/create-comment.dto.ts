@@ -2,6 +2,6 @@ import { IsString, Length } from 'class-validator';
 
 export class CreateCommentDto {
   @IsString()
-  @Length(15, 600)
+  @Length(1, 600)
   body: string;
 }
