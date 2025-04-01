@@ -21,6 +21,9 @@ export class User {
   @Column({ unique: true })
   name: string;
 
+  @Column({ default: 'unknown' })
+  image: string;
+
   @Exclude()
   @Column()
   password: string;
