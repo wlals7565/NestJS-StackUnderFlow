@@ -13,16 +13,19 @@ export class ImagesService {
     return 'This action adds a new image';
   }
 
-  async uploadFile(file: Express.Multer.File, username: string) {
+  async uploadFile(
+    file: Express.Multer.File,
+    username: string,
+    fileName: string = uuidv4(),
+  ) {
     const uploadDir = path.join(this.baseUploadPath, 'images', username);
-    const randomName = uuidv4();
     const [type, fileExtension] = file.mimetype.split('/');
 
     if (type !== 'image') {
       throw new BadRequestException('지원되지 않는 파일 형식입니다.');
     }
 
-    const filePath = path.join(uploadDir, `${randomName}.${fileExtension}`);
+    const filePath = path.join(uploadDir, `${fileName}.${fileExtension}`);
 
     // 디렉토리 생성
     fs.mkdirSync(uploadDir, { recursive: true });
@@ -34,7 +37,7 @@ export class ImagesService {
       'static',
       'images',
       username,
-      `${randomName}.${fileExtension}`,
+      `${fileName}.${fileExtension}`,
     );
 
     return { msg: 'ok', imagePath: fileRelativePath };

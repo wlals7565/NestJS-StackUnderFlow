@@ -27,4 +27,18 @@ export class UserService {
       );
     }
   }
+
+  async uploadUserProfile(userId: string) {
+    try {
+      this.userRepository.update({ id: userId }, { image: 'profile' });
+      return {
+        msg: '정상적으로 프로필 이미지가 업로드 되었습니다.',
+        imageFilename: 'profile',
+      };
+    } catch (error) {
+      throw new InternalServerErrorException(
+        '서버에서 알 수 없는 오류가 발생하였습니다.',
+      );
+    }
+  }
 }
