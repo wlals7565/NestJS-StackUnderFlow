@@ -28,6 +28,8 @@ export class ProfileService {
     }
   }
 
+  // 고칠 것
+  /*
   async uploadAvatar(userId: string, imageUrl: string) {
     try {
       this.profileRepository.update(
@@ -40,6 +42,7 @@ export class ProfileService {
       throw new InternalServerErrorException();
     }
   }
+  */
 
   async patchUserProfileAboutMe(
     user: UserType,

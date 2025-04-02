@@ -12,9 +12,6 @@ export class Profile {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ default: 'unknown' })
-  picturePath: string;
-
   @Column({ default: '' })
   location: string;
 

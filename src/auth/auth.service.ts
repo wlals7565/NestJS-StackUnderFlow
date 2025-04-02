@@ -41,6 +41,7 @@ export class AuthService {
       name: existUser.name,
       email: existUser.email,
       uuid: existUser.id,
+      image: existUser.image,
     });
     return {
       accessToken,
@@ -48,6 +49,7 @@ export class AuthService {
       name: existUser.name,
       email: existUser.email,
       uuid: existUser.id,
+      image: existUser.image,
     };
   }
 
@@ -77,10 +79,11 @@ export class AuthService {
     // 새로운 유저 생성 및 저장
     const picturePath = await this.avatarService.downloadGravatar(
       signupDto.email,
+      signupDto.name,
     );
     const newUser = this.userRepository.create({
       ...signupDto,
-      profile: { picturePath },
+      image: picturePath,
     });
     await this.userRepository.save(newUser);
     return { message: 'Signup successful!' };

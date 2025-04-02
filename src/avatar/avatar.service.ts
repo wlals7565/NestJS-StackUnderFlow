@@ -6,7 +6,7 @@ import * as crypto from 'crypto';
 
 @Injectable()
 export class AvatarService {
-  private avatarDir = path.join(__dirname, '..', 'assets', 'images', 'avatars'); // 저장 폴더 설정
+  private avatarDir = path.join(__dirname, '..', '..', 'assets', 'images'); // 저장 폴더 설정
 
   constructor() {
     if (!fs.existsSync(this.avatarDir)) {
@@ -14,7 +14,10 @@ export class AvatarService {
     }
   }
 
-  async downloadGravatar(email: string): Promise<string | null> {
+  async downloadGravatar(
+    email: string,
+    username: string,
+  ): Promise<string | null> {
     const hash = crypto
       .createHash('md5')
       .update(email.trim().toLowerCase())
@@ -27,9 +30,15 @@ export class AvatarService {
       });
 
       // 파일 이름 바꾸자.
-      const fileName = `${hash}.png`;
-      const filePath = path.join(this.avatarDir, fileName);
+      const fileName = `default.png`;
+      const userDir = path.join(this.avatarDir, username);
 
+      // 폴더가 존재하지 않으면 생성
+      if (!fs.existsSync(userDir)) {
+        fs.mkdirSync(userDir, { recursive: true });
+      }
+
+      const filePath = path.join(userDir, fileName);
       fs.writeFileSync(filePath, response.data);
 
       console.log(`Gravatar saved: ${filePath}`);

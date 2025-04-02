@@ -65,6 +65,7 @@ export class ProfileController {
     return res.send(result);
   }
 
+  /*
   @UseGuards(JwtAuthGuard)
   @Post('/:username/avatar/upload')
   @UseInterceptors(FileInterceptor('avatar', avatarUploadOption))
@@ -75,9 +76,10 @@ export class ProfileController {
     this.profileService.uploadAvatar(user.uuid, file.filename);
     return { imageUrl: file.filename };
   }
+  */
 
   @UseGuards(JwtAuthGuard)
-  @Patch('/:username')
+  @Patch('/:username/aboutMe')
   patchUserProfileAboutMe(
     @GetUser() user: User,
     @Body() patchUserProfileAboutMeDto: PatchUserProfileAboutMeDto,
