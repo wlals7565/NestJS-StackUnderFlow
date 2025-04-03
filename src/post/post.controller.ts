@@ -40,13 +40,14 @@ export class PostController {
     return this.postService.findOne(id);
   }
 
-  @UseGuards()
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   update(
     @Param('id') id: string,
     @Body() updatePostDto: UpdatePostDto,
     @GetUser() user: User,
   ) {
+    console.log(updatePostDto);
     return this.postService.update(id, updatePostDto, user);
   }
 

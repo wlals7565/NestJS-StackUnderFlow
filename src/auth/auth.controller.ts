@@ -53,9 +53,11 @@ export class AuthController {
   @Get('checkAuthStatus')
   async checkAuthStatus(@Req() request: Request) {
     if (request.cookies?.['access_token']) {
-      const result = await this.authService.checkJWT(
+      const userInfo = await this.authService.checkJWT(
         request.cookies['access_token'],
       );
+      const result = await this.authService.getUserInfo(userInfo.uuid);
+      console.log(result);
       return result;
     }
     return { msg: 'No Content' };

@@ -11,6 +11,7 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { AvatarService } from 'src/avatar/avatar.service';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class AuthService {
@@ -41,7 +42,6 @@ export class AuthService {
       name: existUser.name,
       email: existUser.email,
       uuid: existUser.id,
-      image: existUser.image,
     });
     return {
       accessToken,
@@ -92,5 +92,13 @@ export class AuthService {
   async checkJWT(accessToken: string) {
     const result = this.jwtService.verify(accessToken);
     return result;
+  }
+
+  // JWT토큰을 통한 유저 정보 가져오기
+  async getUserInfo(userId: string) {
+    const userInfo = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+    return plainToInstance(User, userInfo);
   }
 }

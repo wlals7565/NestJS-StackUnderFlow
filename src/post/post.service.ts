@@ -47,8 +47,8 @@ export class PostService {
       queryBuilder
         .leftJoinAndSelect('post.author', 'author')
         .leftJoinAndSelect('post.votes', 'votes')
-        .leftJoin('post.answers', 'answers')
-        .loadRelationCountAndMap('post.answerCount', 'post.answers') // answer의 갯수만 계산
+        .leftJoin('post.comments', 'comments')
+        .loadRelationCountAndMap('post.commentCount', 'post.comments') // answer의 갯수만 계산
         .where(
           queryOption.keyword
             ? { title: ILike(`%${queryOption.keyword}%`) }
@@ -150,7 +150,7 @@ export class PostService {
       // 수정하고자 하는 게시글이 없을 때
       if (result.affected === 0) {
         throw new NotFoundException(
-          '게시글을 찾을 수 없거나 삭제할 권한이 없습니다.',
+          '게시글을 찾을 수 없거나 수정할 권한이 없습니다.',
         );
       }
 
