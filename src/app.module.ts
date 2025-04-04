@@ -16,6 +16,7 @@ import { APP_FILTER } from '@nestjs/core';
 import { SlackExceptionFilter } from './common/filters/slack-exception.filter';
 import { ImagesModule } from './images/images.module';
 import { UserModule } from './user/user.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { UserModule } from './user/user.module';
     ProfileModule,
     ImagesModule,
     UserModule,
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [
