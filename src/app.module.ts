@@ -17,6 +17,7 @@ import { SlackExceptionFilter } from './common/filters/slack-exception.filter';
 import { ImagesModule } from './images/images.module';
 import { UserModule } from './user/user.module';
 import { ChatModule } from './chat/chat.module';
+import { FollowsModule } from './follows/follows.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { ChatModule } from './chat/chat.module';
     ImagesModule,
     UserModule,
     ChatModule,
+    FollowsModule,
   ],
   controllers: [AppController],
   providers: [

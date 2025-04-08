@@ -11,6 +11,8 @@ import { User } from 'src/common/types/user.type';
 import { Recommendation } from 'src/recommendation/entities/recommendation.entity';
 import { Repository } from 'typeorm';
 import { Comment } from './entities/comment.entity';
+import { Reply } from 'src/reply/entities/reply.entity';
+import { CreateReplyDto } from './dto/create-reply.dto';
 
 @Injectable()
 export class CommentService {
@@ -19,6 +21,8 @@ export class CommentService {
     private readonly recommendationRepository: Repository<Recommendation>,
     @InjectRepository(Comment)
     private readonly commentRepository: Repository<Comment>,
+    @InjectRepository(Reply)
+    private readonly replyRepository: Repository<Reply>,
   ) {}
   async deleteComment(commentId: string, user: User) {
     try {
@@ -106,5 +110,43 @@ export class CommentService {
       relations: ['recommender'],
     });
     return plainToInstance(Recommendation, recommendations);
+  }
+
+  async replyToComment(commentId: string, createReplyDto: CreateReplyDto, userId: string) {
+    try {
+      const existComment = this.commentRepository.findOne({
+        where: { id: commentId },
+      });
+      if (!existComment) {
+        throw new BadRequestException(
+          '존재하지 않거나 삭제된 댓글에 답글을 달 수 없습니다.',
+        );
+      }
+      const newComment = this.replyRepository.create({
+        body: createReplyDto.body,
+        to: {id: createReplyDto.to},
+        author: { id: userId },
+        parent: { id: commentId },
+      });
+      await this.replyRepository.save(newComment);
+      return { message: '성공적으로 답글을 달았습니다.' };
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new InternalServerErrorException();
+    }
+  }
+
+  async getAllReplies(commentId: string) {
+    try {
+      const replies = this.replyRepository.find({
+        where: { parent: { id: commentId } },
+        relations: ['author'],
+      });
+      return plainToInstance(Reply, replies);
+    } catch (error) {
+      throw new InternalServerErrorException();
+    }
   }
 }

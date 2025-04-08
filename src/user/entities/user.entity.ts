@@ -1,5 +1,6 @@
 import { Exclude } from 'class-transformer';
 import { Comment } from 'src/comment/entities/comment.entity';
+import { Follows } from 'src/follows/entities/follows.entity';
 import { Post } from 'src/post/entities/post.entity';
 import { Vote } from 'src/post/entities/vote.entity';
 import { Profile } from 'src/profile/entities/profile.entity';
@@ -44,6 +45,12 @@ export class User {
   @OneToMany(() => Vote, (vote) => vote.voter)
   votes: Vote[];
 
+  @OneToMany(() => Follows, (follow) => follow.follower)
+  followings: Follows[];
+
+  @OneToMany(() => Follows, (follow) => follow.following)
+  followers: Follows[];
+
   @OneToMany(
     () => Recommendation,
     (Recommendation) => Recommendation.recommender,
@@ -55,4 +62,7 @@ export class User {
 
   @OneToOne(() => Profile, (profile) => profile.user, { cascade: true })
   profile: Profile;
+
+  @OneToMany(() => Reply, (reply) => reply.to)
+  receivedReplies: Reply[];
 }

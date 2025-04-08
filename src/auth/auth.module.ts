@@ -8,10 +8,11 @@ import jwtConfig from 'src/jwtconfig';
 import { JwtStrategy } from './jwt.strategy';
 import { PassportModule } from '@nestjs/passport';
 import { AvatarModule } from 'src/avatar/avatar.module';
+import { Profile } from 'src/profile/entities/profile.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, Profile]),
     JwtModule.registerAsync(jwtConfig),
     PassportModule,
     AvatarModule,

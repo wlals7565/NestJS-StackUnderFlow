@@ -115,6 +115,7 @@ export class AnswerService {
     }
   }
 
+  /* 사용하지 않는 함수
   async reply(answerId: string, createReplyDto: CreateReplyDto, user: User) {
     const reply = this.replyRepository.create({
       body: createReplyDto.body,
@@ -133,4 +134,5 @@ export class AnswerService {
       throw new InternalServerErrorException();
     }
   }
+  */
 }

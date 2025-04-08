@@ -42,7 +42,7 @@ export class AvatarService {
       fs.writeFileSync(filePath, response.data);
 
       console.log(`Gravatar saved: ${filePath}`);
-      return fileName;
+      return "default";
     } catch (error) {
       console.error('Failed to download Gravatar:', error);
       return null;

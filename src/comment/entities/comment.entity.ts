@@ -1,5 +1,6 @@
 import { Post } from 'src/post/entities/post.entity';
 import { Recommendation } from 'src/recommendation/entities/recommendation.entity';
+import { Reply } from 'src/reply/entities/reply.entity';
 import { User } from 'src/user/entities/user.entity';
 import {
   Column,
@@ -39,4 +40,7 @@ export class Comment {
 
   @OneToMany(() => Recommendation, (Recommendation) => Recommendation.comment)
   recommendations: Recommendation[];
+
+  @OneToMany(() => Reply, (reply) => reply.parent)
+  replies: Reply[];
 }

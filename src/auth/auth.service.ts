@@ -12,11 +12,13 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { AvatarService } from 'src/avatar/avatar.service';
 import { plainToInstance } from 'class-transformer';
+import { Profile } from 'src/profile/entities/profile.entity';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
+    @InjectRepository(Profile) private readonly profileRepository: Repository<Profile>,
     private readonly jwtService: JwtService,
     private readonly avatarService: AvatarService,
   ) {}
@@ -86,6 +88,10 @@ export class AuthService {
       image: picturePath,
     });
     await this.userRepository.save(newUser);
+    await this.profileRepository.save({
+      user: {id: newUser.id},
+      aboutMe: "자기소개를 입력해주세요."
+    })
     return { message: 'Signup successful!' };
   }
 

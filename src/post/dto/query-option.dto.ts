@@ -1,4 +1,4 @@
-import { IsNumberString, IsOptional, IsString, Length } from 'class-validator';
+import { IsIn, IsNumberString, IsOptional, IsString, Length } from 'class-validator';
 
 export class QueryOptionDto {
   @IsNumberString()
@@ -13,4 +13,9 @@ export class QueryOptionDto {
   @IsOptional()
   @Length(1, 50)
   keyword?: string;
+
+  @IsString()
+  @IsOptional()
+  @IsIn(['newest','oldest','like','view','comment'])
+  sort?: string;
 }

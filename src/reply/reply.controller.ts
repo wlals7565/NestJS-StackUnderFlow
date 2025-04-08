@@ -12,7 +12,6 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { GetUser } from 'src/common/decorators/get-user-decorator';
 import { User } from 'src/common/types/user.type';
 import { PatchReplyDto } from './dto/patch-reply.dto';
-import { ReplyIdDto } from './dto/reply-id.dto';
 
 @Controller('replies')
 export class ReplyController {
@@ -20,27 +19,14 @@ export class ReplyController {
 
   @UseGuards(JwtAuthGuard)
   @Delete('/:replyId')
-  deleteReply(@Param() replyIdDto: ReplyIdDto, @GetUser() user: User) {
-    return this.replyService.deleteReply(replyIdDto.replyId, user);
+  deleteReply(@Param() replyId: string, @GetUser() user: User) {
+    return this.replyService.deleteReply(replyId, user);
   }
 
   @UseGuards(JwtAuthGuard)
   @Patch('/:replyId')
-  patchReply(
-    @Param() replyIdDto: ReplyIdDto,
-    @GetUser() user: User,
-    @Body() patchReplyDto: PatchReplyDto,
-  ) {
-    return this.replyService.patchReply(
-      replyIdDto.replyId,
-      user,
-      patchReplyDto.body,
-    );
+  patchReply(@Param() replyId: string, @GetUser() user: User, @Body() pathReplyDto:PatchReplyDto) {
+    return this.replyService.patchReply(replyId, user, pathReplyDto.body)
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Post('/:replyId/recommendations')
-  recommend(@Param('replyId') replyId: string, @GetUser() user: User) {
-    return this.replyService.recommend(replyId, user);
-  }
 }

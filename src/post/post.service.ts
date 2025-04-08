@@ -40,29 +40,72 @@ export class PostService {
   }
 
   async findAll(queryOption: QueryOptionDto) {
-    // 3번의 쿼리를 2번으로 줄였다. 1번으로는 불가능할까?
     try {
       const queryBuilder = this.postRepository.createQueryBuilder('post');
-
+  
+      // 기본 쿼리 설정
       queryBuilder
         .leftJoinAndSelect('post.author', 'author')
         .leftJoinAndSelect('post.votes', 'votes')
         .leftJoin('post.comments', 'comments')
-        .loadRelationCountAndMap('post.commentCount', 'post.comments') // answer의 갯수만 계산
+        .loadRelationCountAndMap('post.commentCount', 'post.comments')
         .where(
           queryOption.keyword
             ? { title: ILike(`%${queryOption.keyword}%`) }
             : {},
-        )
-        .skip(queryOption.skip || 0)
-        .take(queryOption.limit || 100)
-        .orderBy('post.createdAt', 'DESC');
-
+        );
+  
+      // sort 옵션에 따른 정렬 설정
+      switch(queryOption.sort) {
+        case 'newest':
+          queryBuilder.orderBy('post.createdAt', 'DESC');
+          break;
+        case 'oldest':
+          queryBuilder.orderBy('post.createdAt', 'ASC');
+          break;
+        case 'like':
+          // 서브쿼리를 사용하여 투표 수 카운트
+          const voteSubQuery = this.postRepository.manager
+            .createQueryBuilder()
+            .select('COUNT("vote"."id")', 'vote_count')
+            .from('vote', 'vote')
+            .where('vote.post_id = post.id');
+            
+          queryBuilder.addSelect(`(${voteSubQuery.getQuery()})`, 'vote_count')
+            .orderBy('vote_count', 'DESC')
+            .addOrderBy('post.createdAt', 'DESC');
+          break;
+        case 'view':
+          queryBuilder.orderBy('post.views', 'DESC')
+            .addOrderBy('post.createdAt', 'DESC');
+          break;
+        case 'comment':
+          // 서브쿼리를 사용하여 댓글 수 카운트
+          const commentSubQuery = this.postRepository.manager
+            .createQueryBuilder()
+            .select('COUNT("comment"."id")', 'comment_count')
+            .from('comment', 'comment')
+            .where('comment.post_id = post.id')
+            .andWhere('comment.deleted_at IS NULL');
+            
+          queryBuilder.addSelect(`(${commentSubQuery.getQuery()})`, 'comment_count')
+            .orderBy('comment_count', 'DESC')
+            .addOrderBy('post.createdAt', 'DESC');
+          break;
+        default:
+          // 기본값은 최신순
+          queryBuilder.orderBy('post.createdAt', 'DESC');
+      }
+  
+      // 페이지네이션 적용
+      queryBuilder.skip(queryOption.skip || 0).take(queryOption.limit || 100);
+  
       const [result, totalCount] = await queryBuilder.getManyAndCount();
       const posts = plainToInstance(Post, result);
-
+  
       return { posts, totalCount };
     } catch (error) {
+      console.error('Query error:', error);
       throw new InternalServerErrorException();
     }
   }
@@ -83,27 +126,11 @@ export class PostService {
         .leftJoinAndSelect('post.votes', 'votes')
         .leftJoinAndSelect('votes.voter', 'voteVoter')
         .leftJoinAndSelect('comments.author', 'commentAuthor')
-        .leftJoinAndSelect('comments.recommendations', 'recommendations')
-        .leftJoinAndSelect(
-          'recommendations.recommender',
-          'recommendationRecommender',
-        )
-        .leftJoinAndSelect('post.answers', 'answers')
-        .leftJoinAndSelect('answers.votes', 'answerVotes')
-        .leftJoinAndSelect('answerVotes.voter', 'answerVoteVoter')
-        .leftJoinAndSelect('answers.replies', 'answerReplies')
-        .leftJoinAndSelect('answerReplies.author', 'answerReplyAuthor')
-        .leftJoinAndSelect(
-          'answerReplies.recommendations',
-          'replyRecommendations',
-        )
-        .leftJoinAndSelect(
-          'replyRecommendations.recommender',
-          'replyRecommendationRecommender',
-        )
+        .leftJoinAndSelect('author.followers', 'followers')
+        .leftJoinAndSelect('followers.follower', 'followerUser')
+        .loadRelationCountAndMap('comments.replyCount', 'comments.replies')
         .where('post.id = :id', { id })
         .orderBy('comments.createdAt', 'ASC') // comments 최신순 정렬
-        .addOrderBy('answers.createdAt', 'ASC') // answers 최신순 정렬
         .getOne();
 
       if (!post) {
@@ -123,6 +150,7 @@ export class PostService {
       // `plainToInstance`를 사용하여 반환 데이터 포맷 변환
       return plainToInstance(Post, post);
     } catch (error) {
+      console.error(error);
       // 오류 발생 시 트랜잭션 롤백
       await queryRunner.rollbackTransaction();
       if (error instanceof HttpException) {

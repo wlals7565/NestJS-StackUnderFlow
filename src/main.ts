@@ -17,6 +17,11 @@ async function bootstrap() {
 
   // 정적 파일 제공
   console.log(__dirname);
+  // react build 한 파일 있는 위치
+  app.use('/assets', express.static(path.join(process.cwd(),'..', 'stackoverflow-front', 'dist', 'assets')))
+  // svg사진 있는 위치
+  app.use('/svg', express.static(path.join(process.cwd(), '..', 'stackoverflow-front', 'svg')))
+  // 사진 요청 시
   app.use('/static', express.static(path.join(process.cwd(), 'assets')));
   app.use(
     `/avatars`,

@@ -55,6 +55,7 @@ export class AnswerController {
   }
 
   // 답글에 대한 댓글
+  /*
   @UseGuards(JwtAuthGuard)
   @Post('/:answerId/replies')
   reply(
@@ -63,6 +64,6 @@ export class AnswerController {
     @Body() createReplyDto: CreateReplyDto,
   ) {
     console.log('hello');
-    return this.answerService.reply(answerId, createReplyDto, user);
-  }
+    retur
+    */
 }

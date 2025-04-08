@@ -42,6 +42,8 @@ export class Answer {
   @ManyToOne(() => Post, (post) => post.answers)
   post: Post;
 
+  /*
   @OneToMany(() => Reply, (reply) => reply.answer)
   replies: Reply[];
+  */
 }

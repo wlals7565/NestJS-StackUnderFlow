@@ -1,4 +1,5 @@
 import { Answer } from 'src/answer/entities/answer.entity';
+import { Comment } from 'src/comment/entities/comment.entity';
 import { ReplyRecommendation } from 'src/recommendation/entities/reply-cormmendation.entity';
 import { User } from 'src/user/entities/user.entity';
 import {
@@ -23,14 +24,17 @@ export class Reply {
   @ManyToOne(() => User, (user) => user.replies)
   author: User;
 
-  @ManyToOne(() => Answer, (answer) => answer.replies)
-  answer: Answer;
+  @ManyToOne(() => Comment, (Comment) => Comment.replies, {nullable: true})
+  parent: Comment;
 
   @OneToMany(
     () => ReplyRecommendation,
     (recommendation) => recommendation.reply,
   )
   recommendations: ReplyRecommendation;
+
+  @ManyToOne(() => User, (user) => user.receivedReplies)
+  to: User;
 
   @CreateDateColumn()
   createdAt: Date;
