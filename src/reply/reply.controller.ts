@@ -19,13 +19,13 @@ export class ReplyController {
 
   @UseGuards(JwtAuthGuard)
   @Delete('/:replyId')
-  deleteReply(@Param() replyId: string, @GetUser() user: User) {
+  deleteReply(@Param('replyId') replyId: string, @GetUser() user: User) {
     return this.replyService.deleteReply(replyId, user);
   }
 
   @UseGuards(JwtAuthGuard)
   @Patch('/:replyId')
-  patchReply(@Param() replyId: string, @GetUser() user: User, @Body() pathReplyDto:PatchReplyDto) {
+  patchReply(@Param('replyId') replyId: string, @GetUser() user: User, @Body() pathReplyDto:PatchReplyDto) {
     return this.replyService.patchReply(replyId, user, pathReplyDto.body)
   }
 

@@ -112,7 +112,11 @@ export class CommentService {
     return plainToInstance(Recommendation, recommendations);
   }
 
-  async replyToComment(commentId: string, createReplyDto: CreateReplyDto, userId: string) {
+  async replyToComment(
+    commentId: string,
+    createReplyDto: CreateReplyDto,
+    userId: string,
+  ) {
     try {
       const existComment = this.commentRepository.findOne({
         where: { id: commentId },
@@ -124,12 +128,17 @@ export class CommentService {
       }
       const newComment = this.replyRepository.create({
         body: createReplyDto.body,
-        to: {id: createReplyDto.to},
+        to: { id: createReplyDto.to },
         author: { id: userId },
         parent: { id: commentId },
       });
-      await this.replyRepository.save(newComment);
-      return { message: '성공적으로 답글을 달았습니다.' };
+      const result = await this.replyRepository.save(newComment);
+      const fullResult = await this.replyRepository.findOne({
+        where: { id: result.id },
+        relations: ['to', 'author', 'parent'],
+      });
+
+      return { message: '성공적으로 답글을 달았습니다.', result: plainToInstance(Reply, fullResult) };
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -142,7 +151,7 @@ export class CommentService {
     try {
       const replies = this.replyRepository.find({
         where: { parent: { id: commentId } },
-        relations: ['author'],
+        relations: ['author', 'to'],
       });
       return plainToInstance(Reply, replies);
     } catch (error) {

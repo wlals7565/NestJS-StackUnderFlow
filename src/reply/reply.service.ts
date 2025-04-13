@@ -20,10 +20,13 @@ export class ReplyService {
 
   async deleteReply(replyId: string, user: User) {
     try {
-      await this.replyRepository.softDelete({
+      const result = await this.replyRepository.softDelete({
         id: replyId,
         author: { id: user.uuid },
       });
+      if(result.affected == 0) {
+        throw new BadRequestException("존재하지 않거나 삭제된 답글은 삭제할 수 없습니다.");
+      }
       return { message: '성공적으로 답글이 삭제되었습니다.' };
     } catch (error) {
       console.error(error);
@@ -45,6 +48,7 @@ export class ReplyService {
       }
       return {message: "성공적으로 답글을 수정하였습니다."}
     } catch (error) {
+      console.log(error);
       if (error instanceof HttpException) {
         throw error;
       }
