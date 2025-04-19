@@ -19,10 +19,11 @@ import { QueryOptionDto } from './dto/query-option.dto';
 import { VoteQueryOption } from './dto/vote-query-option.dto';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { CreateAnswerDto } from './dto/create-answer.dto';
+import AlarmService from 'src/alarm/alarm.service';
 
 @Controller('posts')
 export class PostController {
-  constructor(private readonly postService: PostService) {}
+  constructor(private readonly postService: PostService, private readonly alarmService: AlarmService) {}
 
   @UseGuards(JwtAuthGuard)
   @Post()
@@ -69,12 +70,20 @@ export class PostController {
 
   @UseGuards(JwtAuthGuard)
   @Post(':postId/comments')
-  createComment(
+  async createComment(
     @Body() createCommentDto: CreateCommentDto,
     @Param('postId') postId: string,
     @GetUser() user: User,
   ) {
-    return this.postService.createComment(createCommentDto, postId, user);
+    const result = await this.postService.createComment(createCommentDto, postId, user);
+    
+    // 자기 자신에게는 알람을 보낼 필요가 없으므로 바로 응답 보내기
+    if(createCommentDto.to === user.uuid) {
+      return result;
+    }
+    // 자기 자신이 아닌 사람에게 댓글을 달았다면 알람 생성하기
+    this.alarmService.saveAlarm({title: `게시글에 댓글이 달렸습니다.`, content: createCommentDto.body, url: `questions/${postId}`}, createCommentDto.to)
+    return result;
   }
 
   @UseGuards(JwtAuthGuard)

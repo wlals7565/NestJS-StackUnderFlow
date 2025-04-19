@@ -1,4 +1,5 @@
 import { Exclude } from 'class-transformer';
+import Alarm from 'src/alarm/entities/alarm.entity';
 import { Comment } from 'src/comment/entities/comment.entity';
 import { Follows } from 'src/follows/entities/follows.entity';
 import { Post } from 'src/post/entities/post.entity';
@@ -65,4 +66,7 @@ export class User {
 
   @OneToMany(() => Reply, (reply) => reply.to)
   receivedReplies: Reply[];
+
+  @OneToMany(() => Alarm, (alarm) => alarm.notifiedUser)
+  receivedAlarms: Alarm[];
 }
