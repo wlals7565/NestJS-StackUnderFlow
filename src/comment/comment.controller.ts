@@ -14,10 +14,11 @@ import { GetUser } from 'src/common/decorators/get-user-decorator';
 import { User } from 'src/common/types/user.type';
 import { PatchCommentDto } from './dto/patch-comment.dto';
 import { CreateReplyDto } from 'src/comment/dto/create-reply.dto';
+import AlarmService from 'src/alarm/alarm.service';
 
 @Controller('comments')
 export class CommentController {
-  constructor(private readonly commentService: CommentService) {}
+  constructor(private readonly commentService: CommentService, private readonly alarmService: AlarmService) {}
 
   // 댓글 삭제하기
   @UseGuards(JwtAuthGuard)
@@ -61,11 +62,14 @@ export class CommentController {
     @GetUser() user: User,
     @Body() createReplyDto: CreateReplyDto,
   ) {
-    return this.commentService.replyToComment(
+    const result = await this.commentService.replyToComment(
       commentId,
       createReplyDto,
       user.uuid,
     );
+    if(user.uuid === createReplyDto.to) return result;
+    this.alarmService.saveAlarm({content: createReplyDto.body, title: "댓글에 대한 답글이 달렸습니다.", url: `questions/${createReplyDto.postId}`}, createReplyDto.to)
+    return result
   }
 
   // 특정 댓글의 모든 답글 가져오기

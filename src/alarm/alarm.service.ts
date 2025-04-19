@@ -19,6 +19,7 @@ export default class AlarmService {
       const newAlarm = this.alarmRepository.create({...alarmPayload, notifiedUser: {id: notifiedUserUUID} })
       this.alarmRepository.save(newAlarm)
     } catch (error) {
+      console.error(error)
       if(error instanceof HttpException) {
         throw error;
       }

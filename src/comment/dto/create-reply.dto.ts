@@ -8,4 +8,9 @@ export class CreateReplyDto {
   @IsString()
   @IsUUID()
   to: string;
+
+  @IsString()
+  @IsUUID()
+  postId: string;
+
 }
