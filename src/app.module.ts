@@ -18,6 +18,7 @@ import { ImagesModule } from './images/images.module';
 import { UserModule } from './user/user.module';
 import { ChatModule } from './chat/chat.module';
 import { FollowsModule } from './follows/follows.module';
+import NotificationModule from './notification/notification.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { FollowsModule } from './follows/follows.module';
     UserModule,
     ChatModule,
     FollowsModule,
+    NotificationModule,
   ],
   controllers: [AppController],
   providers: [
